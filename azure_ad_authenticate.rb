@@ -6,22 +6,39 @@ module AzureADAuthenticate
   # The AAD Instance is the instance of Azure, for example public Azure or Azure China.
   # The Redirect URI is the URI where Azure AD will return OAuth responses.
   # The Authority is the sign-in URL of the tenant.
-  def load_settings
+  def self.load_settings
     require 'yaml'
-    Settings = YAML.load_file('settings.yml')
+    YAML.load_file('settings.yml')
 
-    @azure_ad_aad_instance = 'xxx';
-    @azure_ad_tenant = Settings['client_id'];
-    @azure_ad_client_id = Settings['client_id'];
-    @azure_ad_redirect_url = 'xxx';
-    @azure_ad_application_resource_id = 'xxx';
-    @azure_ad_application_base_address = 'xxx';
+
+    # @azure_ad_aad_instance = 'xxx';
+    # @azure_ad_tenant = Settings['client_id'];
+    # @azure_ad_client_id = Settings['client_id'];
+    # @azure_ad_redirect_url = 'xxx';
+    # @azure_ad_application_resource_id = 'xxx';
+    # @azure_ad_application_base_address = 'xxx';
 
   end
 
-  def get_jwt_token
-    load_settings
+  def self.get_login_page
+    require 'net/http'
+    settings = load_settings
 
+    uri = URI(settings['aad_instance'] + settings['tenant'] + '/oauth2/authorize')
+
+    params = {
+      'resource'          => settings['application_resource_id'],
+      'client_id'         => settings['client_id'],
+      'response_type'     => 'code',
+      'redirect_uri'      => settings['redirect_url'],
+      # 'client-request-id' => ,
+      'prompt'            => 'login'
+    }
+    uri.query = URI.encode_www_form(params)
+
+    response = Net::HTTP.get_response(uri)
+
+    puts response.body if response.is_a?(Net::HTTPSuccess)
 
   end
 
