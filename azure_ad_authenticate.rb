@@ -8,7 +8,7 @@ module AzureADAuthenticate
   # The Authority is the sign-in URL of the tenant.
   def self.load_settings
     require 'yaml'
-    YAML.load_file('settings.yml')
+    YAML.load_file(File.join(Rails.root, "lib/settings.yml"))
 
 
     # @azure_ad_aad_instance = 'xxx';
@@ -32,17 +32,35 @@ module AzureADAuthenticate
       'response_type'     => 'code',
       'redirect_uri'      => settings['redirect_url'],
       # 'client-request-id' => ,
-      'prompt'            => 'login',
-      # 'x-client-SKU'      => '.NET',
-      # 'x-client-Ver'      => '2.14.0.0',
-      # 'x-client-CPU'      => 'x86',
-      # 'x-client-OS'       => 'Microsoft+Windows+NT+6.1.7601+Service+Pack+1',
+      'prompt'            => 'login'
     }
     uri.query = URI.encode_www_form(params)
 
-    response = Net::HTTP.get_response(uri)
+    return uri
 
-    puts response.body if response.is_a?(Net::HTTPSuccess)
+  end
+
+  def self.get_access_token(code)
+    require 'net/http'
+    settings = load_settings
+
+    uri = URI(settings['aad_instance'] + settings['tenant'] + '/oauth2/token')
+
+    params = {
+      'resource'          => settings['application_resource_id'],
+      'client_id'         => settings['client_id'],
+      'grant_type'        => 'authorization_code',
+      'code'              => code,
+      'redirect_uri'      => settings['redirect_url']
+    }
+
+    response = Net::HTTP.post_form(uri, params)
+
+    return response
+  end
+
+  def self.refresh_access_token
+
 
   end
 
