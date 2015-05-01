@@ -32,7 +32,11 @@ module AzureADAuthenticate
       'response_type'     => 'code',
       'redirect_uri'      => settings['redirect_url'],
       # 'client-request-id' => ,
-      'prompt'            => 'login'
+      'prompt'            => 'login',
+      # 'x-client-SKU'      => '.NET',
+      # 'x-client-Ver'      => '2.14.0.0',
+      # 'x-client-CPU'      => 'x86',
+      # 'x-client-OS'       => 'Microsoft+Windows+NT+6.1.7601+Service+Pack+1',
     }
     uri.query = URI.encode_www_form(params)
 
