@@ -60,7 +60,16 @@ module AzureADAuthenticate
   end
 
   def self.refresh_access_token
+    params = {
+      'grant_type'        => 'refresh_token',
+      'resource'          => settings['application_resource_id'],
+      'refresh_token'     => settings['refresh_token'],
+      'client_id'         => settings['client_id']
+    }
 
+    response = Net::HTTP.post_form(uri, params)
+
+    return response
 
   end
 
